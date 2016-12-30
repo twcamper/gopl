@@ -4,35 +4,56 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
+var counts map[string]int
+var files map[string][]string
+
+func init() {
+	counts = make(map[string]int)
+	files = make(map[string][]string)
+}
+
 func main() {
-	counts := make(map[string]int)
-	files := os.Args[1:]
-	if len(files) == 0 {
-		countLines(os.Stdin, counts)
-	} else {
-		for _, arg := range files {
-			f, err := os.Open(arg)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "dup2: %v\n", err)
-				continue
-			}
-			countLines(f, counts)
-			f.Close()
+	inputFiles := os.Args[1:]
+
+	for _, arg := range inputFiles {
+		f, err := os.Open(arg)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "dup2: %v\n", err)
+			continue
 		}
+		analyzeFile(f)
+		f.Close()
 	}
-	for line, n := range counts {
-		if n > 1 {
-			fmt.Printf("%d\t%s\n", n, line)
+	for key, val := range counts {
+		if val > 1 {
+			fmt.Printf("%d\t'%s'\t%v\n", val, key, strings.Join(files[key], ", "))
 		}
 	}
 }
 
-func countLines(f *os.File, counts map[string]int) {
+func analyzeFile(f *os.File) {
 	input := bufio.NewScanner(f)
 	for input.Scan() {
-		counts[input.Text()]++
+		analyzeLine(input.Text(), f.Name())
 	}
-	//NOTE: ignoring potential errors from input.Error
+	// NOTE: ignoring potential errors from input.Error
+}
+
+func analyzeLine(line, fileName string) {
+	counts[line]++
+	if !contains(files[line], fileName) {
+		files[line] = append(files[line], fileName)
+	}
+}
+
+func contains(files []string, path string) bool {
+	for _, item := range files {
+		if item == path {
+			return true
+		}
+	}
+	return false
 }
