@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 )
@@ -14,12 +14,12 @@ func main() {
 			fmt.Fprintf(os.Stderr, "fetch: %v\n", err)
 			os.Exit(1)
 		}
-		body, err := ioutil.ReadAll(response.Body)
+		size, err := io.Copy(os.Stdout, response.Body)
 		response.Body.Close()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "fetch: reading %s: %v\n", url, err)
 			os.Exit(1)
 		}
-		fmt.Printf("%s", body)
+		fmt.Printf("\nfetch: Read %d bytes\n", size)
 	}
 }
