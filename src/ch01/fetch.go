@@ -14,12 +14,13 @@ func main() {
 			fmt.Fprintf(os.Stderr, "fetch: %v\n", err)
 			os.Exit(1)
 		}
+		fmt.Printf("HTTP status: %v\n\n", response.Status)
 		size, err := io.Copy(os.Stdout, response.Body)
 		response.Body.Close()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "fetch: reading %s: %v\n", url, err)
 			os.Exit(1)
 		}
-		fmt.Printf("\nfetch: Read %d bytes\n", size)
+		fmt.Printf("\nRead %d bytes\n", size)
 	}
 }
