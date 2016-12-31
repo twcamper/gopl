@@ -9,13 +9,15 @@ import (
 )
 
 func main() {
-	for _, arg := range os.Args[1:] {
+	howMany := len(os.Args) - 1
+	for i, arg := range os.Args[1:] {
+		which := i + 1
 		url := toURL(arg)
 		response := getResponse(url.String())
-		printHeader(response)
+		printHeader(response, which, howMany)
 		reportContent(response)
 		reportMeta(response)
-		printFooter(response)
+		printFooter(response, which, howMany)
 	}
 }
 
@@ -61,10 +63,10 @@ func reportContent(r *http.Response) {
 	fmt.Println()
 }
 
-func printHeader(r *http.Response) {
-	fmt.Printf("******************** BEGIN %s %s ********************\n", r.Request.Method, r.Request.URL.String())
+func printHeader(r *http.Response, i int, total int) {
+	fmt.Printf("******************** BEGIN %s %s (%d of %d) ********************\n", r.Request.Method, r.Request.URL.String(), i, total)
 }
 
-func printFooter(r *http.Response) {
-	fmt.Printf("******************** END %s %s ********************\n\n", r.Request.Method, r.Request.URL.String())
+func printFooter(r *http.Response, i int, total int) {
+	fmt.Printf("******************** END %s %s (%d of %d) *******************\n\n", r.Request.Method, r.Request.URL.String(), i, total)
 }
