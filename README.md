@@ -1,4 +1,4 @@
-h3. GOPL
+## GOPL
 
 This is just repo for my doodles and exercise solutions as I work
 through the book "The Go Programming Language".
