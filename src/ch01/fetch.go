@@ -12,8 +12,10 @@ func main() {
 	for _, arg := range os.Args[1:] {
 		url := toURL(arg)
 		response := getResponse(url.String())
-		reportMeta(response)
+		printHeader(response)
 		reportContent(response)
+		reportMeta(response)
+		printFooter(response)
 	}
 }
 
@@ -56,4 +58,13 @@ func reportContent(r *http.Response) {
 		os.Exit(1)
 	}
 	fmt.Printf("\nRead %d bytes\n", size)
+	fmt.Println()
+}
+
+func printHeader(r *http.Response) {
+	fmt.Printf("******************** BEGIN %s %s ********************\n", r.Request.Method, r.Request.URL.String())
+}
+
+func printFooter(r *http.Response) {
+	fmt.Printf("******************** END %s %s ********************\n\n", r.Request.Method, r.Request.URL.String())
 }
