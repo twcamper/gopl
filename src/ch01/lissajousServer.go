@@ -9,21 +9,21 @@ import (
 	"math"
 	"math/rand"
 	"net/http"
+	"net/url"
+	"strconv"
 )
 
 func main() {
 	http.HandleFunc("/lissajous", handler)
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
-
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	imageConfig := configure()
+	imageConfig := configure(getForm(r))
 	lissajous(w, imageConfig)
 }
 
 func lissajous(out io.Writer, cfg *ImageConfig) {
-
 	const (
 		backgroundIndex = 0
 		foregroundIndex = 1
@@ -66,11 +66,56 @@ type ImageConfig struct {
 	Delay             int
 }
 
-func configure() *ImageConfig {
-	return &ImageConfig{
+func configure(form *url.Values) *ImageConfig {
+	cfg := ImageConfig{
 		XOscillatorCycles: 5,
 		AngularResolution: 0.001,
-		CanvasSize:        350,
+		CanvasSize:        100,
 		FrameCount:        64,
 		Delay:             8}
+
+	for k, v := range *form {
+		switch k {
+		case "XOscillatorCycles":
+			setFloat(v, &cfg.XOscillatorCycles)
+		case "AngularResolution":
+			setFloat(v, &cfg.AngularResolution)
+		case "CanvasSize":
+			setInt(v, &cfg.CanvasSize)
+		case "FrameCount":
+			setInt(v, &cfg.FrameCount)
+		case "Delay":
+			setInt(v, &cfg.Delay)
+		default:
+			log.Printf("Incorrect query parameter '%s'", k)
+		}
+	}
+	return &cfg
+}
+
+func getForm(r *http.Request) *url.Values {
+	if err := r.ParseForm(); err != nil {
+		log.Print(err)
+	}
+	return &r.Form
+}
+
+func setInt(slice []string, field *int) {
+	s := slice[0]
+	i, error := strconv.Atoi(s)
+	if error == nil {
+		*field = i
+	} else {
+		log.Printf("setInt(): %v\n", error)
+	}
+}
+
+func setFloat(slice []string, field *float64) {
+	s := slice[0]
+	f, error := strconv.ParseFloat(s, 64)
+	if error == nil {
+		*field = f
+	} else {
+		log.Printf("setFloat(): %v\n", error)
+	}
 }
