@@ -19,11 +19,11 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	imageConfig := configure(getForm(r))
-	lissajous(w, imageConfig)
+	imgCfg := configure(getForm(r))
+	lissajous(w, imgCfg)
 }
 
-func lissajous(out io.Writer, cfg *ImageConfig) {
+func lissajous(out io.Writer, cfg *imageConfig) {
 	const (
 		backgroundIndex = 0
 		foregroundIndex = 1
@@ -58,7 +58,7 @@ func calculateColorIndexCoordinate(rawCoordinate float64, size int) int {
 	return size + int(offset)
 }
 
-type ImageConfig struct {
+type imageConfig struct {
 	XOscillatorCycles float64
 	AngularResolution float64
 	CanvasSize        int
@@ -66,8 +66,8 @@ type ImageConfig struct {
 	Delay             int
 }
 
-func configure(form *url.Values) *ImageConfig {
-	cfg := ImageConfig{
+func configure(form *url.Values) *imageConfig {
+	cfg := imageConfig{
 		XOscillatorCycles: 5,
 		AngularResolution: 0.001,
 		CanvasSize:        100,
