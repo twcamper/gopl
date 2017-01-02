@@ -12,8 +12,8 @@ import (
 var contentOnly bool
 
 func init() {
-	flag.BoolVar(&contentOnly, "c", false, "do report meta data: only response bodies, e.g. HTML")
-	flag.BoolVar(&contentOnly, "content-only", false, "do report meta data: only response bodies, e.g. HTML")
+	flag.BoolVar(&contentOnly, "c", false, "do not report meta data: only response bodies, e.g. HTML")
+	flag.BoolVar(&contentOnly, "content-only", false, "do not report meta data: only response bodies, e.g. HTML")
 }
 func main() {
 	flag.Parse()
