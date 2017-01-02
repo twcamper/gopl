@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -8,16 +9,27 @@ import (
 	"os"
 )
 
+var contentOnly bool
+
+func init() {
+	flag.BoolVar(&contentOnly, "c", false, "do report meta data: only response bodies, e.g. HTML")
+	flag.BoolVar(&contentOnly, "content-only", false, "do report meta data: only response bodies, e.g. HTML")
+}
 func main() {
-	howMany := len(os.Args) - 1
-	for i, arg := range os.Args[1:] {
+	flag.Parse()
+	howMany := len(flag.Args()) - 1
+	for i, arg := range flag.Args() {
 		which := i + 1
 		url := toURL(arg)
 		response := getResponse(url.String())
-		printHeader(response, which, howMany)
-		reportContent(response)
-		reportMeta(response)
-		printFooter(response, which, howMany)
+		if !contentOnly {
+			printHeader(response, which, howMany)
+		}
+		size := reportContent(response)
+		if !contentOnly {
+			reportMeta(response, size)
+			printFooter(response, which, howMany)
+		}
 	}
 }
 
@@ -42,7 +54,9 @@ func getResponse(url string) *http.Response {
 	return r
 }
 
-func reportMeta(r *http.Response) {
+func reportMeta(r *http.Response, size int64) {
+	fmt.Printf("\nRead %d bytes\n", size)
+	fmt.Println()
 	fmt.Printf("%s %s\n", r.Request.Method, r.Request.URL.String())
 	fmt.Println(r.Status)
 	fmt.Println("\nResponse Headers:")
@@ -52,15 +66,14 @@ func reportMeta(r *http.Response) {
 	fmt.Println()
 }
 
-func reportContent(r *http.Response) {
+func reportContent(r *http.Response) int64 {
 	size, err := io.Copy(os.Stdout, r.Body)
 	r.Body.Close()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "fetch.reportContent(): reading %s: %v\n", r.Request.URL.String(), err)
 		os.Exit(1)
 	}
-	fmt.Printf("\nRead %d bytes\n", size)
-	fmt.Println()
+	return size
 }
 
 func printHeader(r *http.Response, i int, total int) {
