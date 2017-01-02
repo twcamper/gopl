@@ -6,16 +6,24 @@ package main
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/twcamper/gopl/ch05/htmlutil"
 	"golang.org/x/net/html"
 )
 
 func main() {
-	doc := htmlutil.Read()
-	for _, link := range visit(nil, doc) {
+	for _, link := range visit(nil, read()) {
 		fmt.Println(link)
 	}
+}
+
+func read() *html.Node {
+	doc, err := html.Parse(os.Stdin)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
+		os.Exit(1)
+	}
+	return doc
 }
 
 // appends to links each link found in n and returns the result

@@ -3,14 +3,14 @@ package main
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/twcamper/gopl/ch05/htmlutil"
 	"golang.org/x/net/html"
 )
 
 func main() {
 	tagCounts := make(map[string]int)
-	tagMap(tagCounts, htmlutil.Read())
+	tagMap(tagCounts, read())
 	for tag, count := range tagCounts {
 		fmt.Printf("%s:\t%d\n", tag, count)
 	}
@@ -23,4 +23,13 @@ func tagMap(tagCounts map[string]int, n *html.Node) {
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		tagMap(tagCounts, c)
 	}
+}
+
+func read() *html.Node {
+	doc, err := html.Parse(os.Stdin)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
+		os.Exit(1)
+	}
+	return doc
 }

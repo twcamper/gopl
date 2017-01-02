@@ -2,14 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/twcamper/gopl/ch05/htmlutil"
 	"golang.org/x/net/html"
 )
 
 func main() {
-	doc := htmlutil.Read()
-	outline(nil, doc)
+	outline(nil, read())
 }
 
 func outline(stack []string, n *html.Node) {
@@ -20,4 +19,13 @@ func outline(stack []string, n *html.Node) {
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		outline(stack, c)
 	}
+}
+
+func read() *html.Node {
+	doc, err := html.Parse(os.Stdin)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
+		os.Exit(1)
+	}
+	return doc
 }
