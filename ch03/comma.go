@@ -15,7 +15,7 @@ func main() {
 func comma(s string) string {
 	var buffer bytes.Buffer
 	var to int = 3
-	if r := len(s) % 3; r > 0 {
+	if (r := len(s) % 3) > 0 {
 		to = r
 	}
 	for from := 0; to <= len(s); from, to = to, to+3 {
