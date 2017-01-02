@@ -15,7 +15,7 @@ func main() {
 func read() *html.Node {
 	doc, err := html.Parse(os.Stdin)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "findlinks: %v\n", err)
+		fmt.Fprintf(os.Stderr, "outline: %v\n", err)
 		os.Exit(1)
 	}
 	return doc
