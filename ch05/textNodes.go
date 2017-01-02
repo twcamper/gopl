@@ -5,24 +5,15 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
+	"github.com/twcamper/gopl/ch05/htmlutil"
 	"golang.org/x/net/html"
 )
 
 func main() {
-	doc := read()
+	doc := htmlutil.Read()
 	textNodes(nil, doc)
-}
-
-func read() *html.Node {
-	doc, err := html.Parse(os.Stdin)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "textNodes: %v\n", err)
-		os.Exit(1)
-	}
-	return doc
 }
 
 func textNodes(stack []string, n *html.Node) {

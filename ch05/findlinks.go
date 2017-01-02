@@ -1,40 +1,35 @@
-// Prints the links in an HTML document read from stdin
+/*
+  Prints the links in an HTML document read from stdin
+  Exercise 5.1: Change the findlinks program to traverse the n.FirstChild linked list using recursion calls to _visit_ instead of a loop.
+*/
 package main
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/twcamper/gopl/ch05/htmlutil"
 	"golang.org/x/net/html"
 )
 
 func main() {
-	doc := read()
+	doc := htmlutil.Read()
 	for _, link := range visit(nil, doc) {
 		fmt.Println(link)
 	}
 }
 
-func read() *html.Node {
-	doc, err := html.Parse(os.Stdin)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "findlinks: %v\n", err)
-		os.Exit(1)
-	}
-	return doc
-}
-
 // appends to links each link found in n and returns the result
 func visit(links []string, n *html.Node) []string {
-	if n.Type == html.ElementNode && n.Data == "a" {
-		for _, a := range n.Attr {
-			if a.Key == "href" {
-				links = append(links, a.Val)
+	if n != nil {
+		if n.Type == html.ElementNode && n.Data == "a" {
+			for _, a := range n.Attr {
+				if a.Key == "href" {
+					links = append(links, a.Val)
+				}
 			}
 		}
-	}
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		links = visit(links, c)
+		links = visit(links, n.FirstChild)
+		links = visit(links, n.NextSibling)
 	}
 	return links
 }
