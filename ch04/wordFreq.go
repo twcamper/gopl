@@ -22,7 +22,8 @@ func count() {
 	input := bufio.NewScanner(os.Stdin)
 	input.Split(bufio.ScanWords)
 	for input.Scan() {
-		wordCounts[strings.Trim(input.Text(), ",.'\";:!")]++
+		word := strings.Trim(input.Text(), ",.'\";:!?")
+		wordCounts[word]++
 	}
 	if err := input.Err(); err != nil {
 
