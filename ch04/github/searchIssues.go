@@ -9,9 +9,9 @@ import (
 )
 
 // SearchIssues queries the GitHub issue tracker
-func SearchIssues(terms []string) (*IssuesSearchResult, error) {
+func SearchIssues(uri string, terms []string) (*IssuesSearchResult, error) {
 	q := url.QueryEscape(strings.Join(terms, " "))
-	response, err := http.Get(IssuesURL + "?q=" + q)
+	response, err := http.Get(uri + "?q=" + q)
 	if err != nil {
 		return nil, err
 	}
