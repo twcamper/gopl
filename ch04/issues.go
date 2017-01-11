@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/ogier/pflag"
 	"github.com/twcamper/gopl/ch04/dateTime"
@@ -14,11 +15,9 @@ var (
 	serviceUrl string
 	fromIn     string
 	toIn       string
-	from       *dateTime.DateTime
-	to         *dateTime.DateTime
+	from       time.Time
+	to         time.Time
 )
-
-const dateTimeFormat string = "2006-01-02 15:04:05"
 
 func init() {
 	pflag.StringVarP(&serviceUrl, "url", "u", "", "alternate url")
@@ -51,11 +50,13 @@ func url() string {
 
 func printRows() {
 	for _, item := range result.Items {
-		fmt.Printf("#%-5d %9.9s %s %.85s\n",
-			item.Number,
-			item.User.Login,
-			item.CreatedAt.Format(dateTimeFormat),
-			item.Title)
+		if item.CreatedAt.After(from) && item.CreatedAt.Before(to) {
+			fmt.Printf("#%-5d %9.9s %s %.85s\n",
+				item.Number,
+				item.User.Login,
+				item.CreatedAt.Format(dateTime.Format),
+				item.Title)
+		}
 	}
 }
 func printHeader() {
@@ -63,18 +64,17 @@ func printHeader() {
 }
 
 func parseDates() {
-	parse(&from, fromIn)
-	parse(&to, toIn)
-	fmt.Printf("From: %v\n", from)
-	fmt.Printf("To: %s\n", to)
+	from = parseDate(fromIn)
+	to = parseDate(toIn)
+	if to.IsZero() {
+		to = time.Now()
+	}
 }
 
-func parse(dt **dateTime.DateTime, s string) {
-	var err error
-	if len(s) > 0 {
-		*dt, err = dateTime.NewDateTime(s)
-		if err != nil {
-			log.Fatal(err)
-		}
+func parseDate(s string) time.Time {
+	t, err := dateTime.NewDateTime(s)
+	if err != nil {
+		log.Fatal(err)
 	}
+	return t
 }
